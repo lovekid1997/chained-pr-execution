@@ -1,0 +1,29 @@
+{
+  "name": "@anthropic-skills/chained-pr-execution",
+  "version": "1.0.0",
+  "description": "Claude Code skill for executing GitHub issues through chained Pull Requests with linked comments",
+  "keywords": [
+    "claude-code",
+    "skill",
+    "github",
+    "pull-request",
+    "stacked-pr",
+    "workflow",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "homepage": "",
+  "bugs": {
+    "url": ""
+  },
+  "claude-skill": {
+    "name": "chained-pr-execution",
+    "entry": "SKILL.md",
+    "version": "1.0"
+  }
+}

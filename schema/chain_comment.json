@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Chain Comment Schema",
+  "description": "Schema for validating PR chain report comments",
+  "type": "object",
+  "required": [
+    "issue_number",
+    "position",
+    "depends_on",
+    "unblocks",
+    "changes",
+    "delta",
+    "next_preview",
+    "review_notes",
+    "chain_overview"
+  ],
+  "properties": {
+    "issue_number": {
+      "type": "integer"
+    },
+    "position": {
+      "type": "object",
+      "required": ["layer", "description"],
+      "properties": {
+        "layer": {
+          "type": "string",
+          "enum": ["A", "B", "C"]
+        },
+        "description": {
+          "type": "string",
+          "enum": ["first in chain", "middle in chain", "last in chain"]
+        }
+      }
+    },
+    "depends_on": {
+      "oneOf": [
+        { "type": "integer" },
+        { "type": "string", "const": "None (first in chain)" }
+      ]
+    },
+    "unblocks": {
+      "oneOf": [
+        { "type": "integer" },
+        { "type": "string", "const": "None (last in chain)" }
+      ]
+    },
+    "changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "List of changes in this PR"
+    },
+    "delta": {
+      "type": "object",
+      "required": ["from_previous", "why_separate"],
+      "properties": {
+        "from_previous": {
+          "type": "string",
+          "description": "What previous PR established"
+        },
+        "this_adds": {
+          "type": "string",
+          "description": "What this PR adds on top"
+        },
+        "why_separate": {
+          "type": "string",
+          "description": "Why these changes are in separate PR"
+        }
+      }
+    },
+    "next_preview": {
+      "type": "object",
+      "required": ["will_add", "why_separate"],
+      "properties": {
+        "pr_number": {
+          "type": "integer"
+        },
+        "will_add": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "why_separate": {
+          "type": "string"
+        }
+      }
+    },
+    "review_notes": {
+      "type": "object",
+      "required": ["risk_level", "key_files", "testing"],
+      "properties": {
+        "risk_level": {
+          "type": "string",
+          "enum": ["Low", "Medium", "High"]
+        },
+        "key_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "testing": {
+          "type": "string"
+        }
+      }
+    },
+    "chain_overview": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pr_number", "status", "description"],
+        "properties": {
+          "pr_number": { "type": "integer" },
+          "status": {
+            "type": "string",
+            "enum": ["Merged", "Open", "In Review", "Draft", "Blocked"]
+          },
+          "description": { "type": "string" },
+          "is_current": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
