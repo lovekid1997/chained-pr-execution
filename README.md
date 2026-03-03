@@ -1,25 +1,43 @@
 # Chained PR Execution Skill
 
-A [Claude Code](https://claude.ai/code) skill for executing GitHub issues through chained Pull Requests with linked comments.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue)](https://claude.ai/code)
 
-## Features
+A [Claude Code](https://claude.ai/code) skill that transforms GitHub issues into **chained Pull Requests** with intelligent splitting and linked comments.
 
-- Parse GitHub issues with HOW implementation guides
-- Split implementation into atomic PRs (Foundation → Feature → Integration)
-- Create stacked PR chains (A ← B ← C)
-- Generate linked chain report comments
-- Validate PR structure with JSON schemas
+## The Problem
+
+Large features are hard to review. A single 1000-line PR is:
+- Difficult to understand
+- Risky to merge
+- Slow to review
+
+## The Solution
+
+Split into **atomic, chained PRs** that tell a story:
+
+```
+Issue #123: Add user authentication
+         │
+         ▼
+    ┌─────────┐     ┌─────────┐     ┌─────────┐
+    │  PR A   │ ──► │  PR B   │ ──► │  PR C   │
+    │  Utils  │     │ Feature │     │  Tests  │
+    └─────────┘     └─────────┘     └─────────┘
+       100 LOC        200 LOC         150 LOC
+
+Each PR: Small, focused, reviewable
+Comments: Linked, forming a narrative
+```
 
 ## Installation
 
-### Option 1: Clone to personal skills
 ```bash
-git clone https://github.com/YOUR_ORG/chained-pr-execution.git ~/.claude/skills/chained-pr-execution
-```
+# Personal (all projects)
+git clone https://github.com/lovekid1997/chained-pr-execution.git ~/.claude/skills/chained-pr-execution
 
-### Option 2: Clone to project
-```bash
-git clone https://github.com/YOUR_ORG/chained-pr-execution.git .claude/skills/chained-pr-execution
+# Or project-specific
+git clone https://github.com/lovekid1997/chained-pr-execution.git .claude/skills/chained-pr-execution
 ```
 
 ## Usage
@@ -29,67 +47,62 @@ git clone https://github.com/YOUR_ORG/chained-pr-execution.git .claude/skills/ch
 ```
 
 ### Example
+
 ```bash
 /chain-pr 123
 ```
 
-## Workflow
+Claude will:
+1. Read issue #123 and parse the HOW section
+2. Create an execution plan (split into A/B/C layers)
+3. Guide you through implementation
+4. Create chained PRs with proper base branches
+5. Add linked chain report comments
 
-```
-┌─────────────────┐
-│  GitHub Issue   │
-│   (with HOW)    │
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  Parse & Plan   │
-│   A → B → C     │
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│   Implement     │
-│   By Layers     │
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  Create Chain   │
-│   A ← B ← C     │
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│ Linked Comments │
-└─────────────────┘
+## How It Works
+
+### 1. Issue with HOW
+
+Your issue should have a HOW section:
+
+```markdown
+## Problem
+Need to add JWT authentication.
+
+## HOW
+1. Create JWT utility functions
+2. Add TokenPayload types
+3. Implement auth middleware
+4. Add login/logout routes
+5. Write integration tests
+6. Update API docs
 ```
 
-## PR Layers
+### 2. Automatic Layer Mapping
 
-| Layer | Purpose | Examples |
-|-------|---------|----------|
-| **A** | Foundation | Utils, types, configs |
-| **B** | Feature | Main implementation, routes |
-| **C** | Integration | Tests, docs, exports |
+| HOW Step | Layer | Why |
+|----------|-------|-----|
+| JWT utilities | **A** | Foundation - others depend on this |
+| Types | **A** | Foundation - shared definitions |
+| Auth middleware | **B** | Feature - main logic |
+| Routes | **B** | Feature - uses middleware |
+| Tests | **C** | Integration - tests complete feature |
+| Docs | **C** | Integration - documents final API |
 
-## Chain Structure
+### 3. Chained PRs
 
 ```
 main
- └── PR A (foundation)
-      └── PR B (feature)
-           └── PR C (integration)
+ └── PR A: [A] #123 - JWT utilities & types
+      └── PR B: [B] #123 - Auth middleware & routes
+           └── PR C: [C] #123 - Tests & documentation
 ```
 
-PRs are merged in order: A → B → C
+**Merge order**: A → B → C (always)
 
-## Comment Linking
+### 4. Linked Comments
 
-Each PR includes a **Chain Report** comment that:
-- References the parent issue
-- Links to dependent PRs (Depends On / Unblocks)
-- Explains delta from previous PR
-- Previews what next PR adds
-- Shows chain overview with all PR statuses
-
-### Example Chain Report
+Each PR gets a **Chain Report** comment:
 
 ```markdown
 ## 🔗 Chain Report
@@ -100,14 +113,17 @@ Each PR includes a **Chain Report** comment that:
 **Unblocks**: #457
 
 ### 📋 Changes in This PR
-- Implement auth middleware
-- Add login/logout routes
+- Implement auth middleware using JWT utils from PR A
+- Add /login and /logout routes
 
 ### 🔄 Delta from Previous PR
-Building on PR A (#455) which added JWT utilities...
+**PR A established**: JWT utilities, TokenPayload types
+**This PR adds**: Actual middleware and routes that USE those utilities
+**Why separate**: Middleware is feature code; utilities are foundation
 
 ### ➡️ What Next PR Will Add
-PR C (#457) will add tests and documentation...
+PR C will add integration tests and API documentation.
+Separated because tests should verify the complete feature.
 
 ### 📊 Chain Overview
 | PR | Status | Description |
@@ -117,53 +133,106 @@ PR C (#457) will add tests and documentation...
 | #457 | 🔄 Open | Tests & docs |
 ```
 
+**Key**: Comments are NOT independent. They reference each other and form a coherent narrative.
+
+## PR Layers Explained
+
+| Layer | Name | Contains | Size Target |
+|-------|------|----------|-------------|
+| **A** | Foundation | Utils, types, configs, shared code | 100-200 LOC |
+| **B** | Feature | Main implementation, business logic | 200-300 LOC |
+| **C** | Integration | Tests, docs, exports, wiring | 100-200 LOC |
+
+### Why This Split?
+
+- **A first**: Others depend on it. Can be reviewed independently.
+- **B second**: Uses A. Contains the "meat" of the feature.
+- **C last**: Tests the complete feature. Documents the final API.
+
 ## Directory Structure
 
 ```
 chained-pr-execution/
-├── SKILL.md                    # Main skill entry
-├── README.md                   # This file
-├── package.json                # Package metadata
-├── LICENSE                     # MIT License
+├── SKILL.md                    # Main skill (invoke with /chain-pr)
 │
 ├── rules/
-│   ├── issue-parsing.md        # Parse HOW from issues
-│   ├── pr-splitting-rule.md    # Atomic PR rules
-│   ├── pr-chain-rule.md        # Chain creation rules
+│   ├── issue-parsing.md        # How to parse HOW from issues
+│   ├── pr-splitting-rule.md    # Atomic PR splitting rules
+│   ├── pr-chain-rule.md        # Chain creation & merge order
 │   ├── pr-comment-format.md    # Comment template
-│   └── comment-linking-rule.md # Comment linking rules
+│   └── comment-linking-rule.md # How comments reference each other
 │
 ├── templates/
 │   ├── pr_description.md       # PR description template
-│   └── chain_report_comment.md # Comment template
+│   └── chain_report_comment.md # Chain report template
 │
 └── schema/
-    ├── pr_chain.json           # PR chain validation
-    └── chain_comment.json      # Comment validation
+    ├── pr_chain.json           # Validate PR chain structure
+    └── chain_comment.json      # Validate comment structure
 ```
 
 ## Customization
 
-### Modify PR Layers
-Edit `schema/pr_chain.json` to add layers (A1, A2, B1, B2, etc.)
+### Add More Layers
 
-### Change Comment Format
-Edit `rules/pr-comment-format.md` and `templates/chain_report_comment.md`
+For larger features, use sub-layers:
 
-### Adjust Branch Naming
-Edit `rules/pr-chain-rule.md` branch naming section
+```json
+// schema/pr_chain.json
+"layer": {
+  "enum": ["A", "A1", "A2", "B", "B1", "B2", "C", "C1", "C2"]
+}
+```
+
+### Change Branch Naming
+
+Edit `rules/pr-chain-rule.md`:
+
+```
+feat/<issue>-<layer>[-description]
+→ feat/123-a-jwt-utils
+→ feat/123-b-auth-middleware
+```
+
+### Modify Comment Format
+
+Edit `templates/chain_report_comment.md` to match your team's style.
+
+## Best Practices
+
+1. **Parse HOW first** - Don't code without a plan
+2. **Keep PRs atomic** - One logical change per PR
+3. **Update all comments** - When any PR status changes
+4. **Merge in order** - Always A → B → C
+5. **Rebase the chain** - When main is updated, rebase A, then B, then C
 
 ## Requirements
 
-- [Claude Code](https://claude.ai/code) CLI
-- GitHub CLI (`gh`) installed and authenticated
+- [Claude Code](https://claude.ai/code) CLI installed
+- [GitHub CLI](https://cli.github.com/) (`gh`) authenticated
 - Git
+
+## Philosophy
+
+This skill implements a **Stacked PR Workflow** similar to:
+- [Graphite](https://graphite.dev/)
+- [Gerrit patch chains](https://gerrit-review.googlesource.com/Documentation/)
+- [git-branchless](https://github.com/arxanas/git-branchless)
+
+But integrated directly into Claude Code for AI-assisted execution.
+
+## Contributing
+
+1. Fork the repo
+2. Create your feature branch
+3. Commit changes
+4. Push and create a PR
+
+## License
+
+MIT
 
 ## Related
 
 - [Agent Skills Standard](https://agentskills.io)
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)
-
-## License
-
-MIT
