@@ -66,9 +66,9 @@ Every PR in a chain MUST have a comment with this structure:
 
 ### 📋 Changes in This PR
 
-- Add `validateToken()` utility function
-- Add `TokenPayload` type definition
-- Add JWT configuration constants
+- Add `buildSearchIndex()` utility function
+- Add `SearchQuery` and `SearchResult` type definitions
+- Add search configuration constants
 
 ---
 
@@ -76,26 +76,26 @@ Every PR in a chain MUST have a comment with this structure:
 
 N/A - This is the foundation PR.
 
-This PR establishes the utilities that will be used by the auth middleware in PR B.
+This PR establishes the utilities that will be used by the search service in PR B.
 
 ---
 
 ### ➡️ What Next PR Will Add
 
 PR B (#456) will:
-- Use `validateToken()` in auth middleware
-- Implement login/logout routes
-- Add session management
+- Use `buildSearchIndex()` in search service
+- Implement /search API endpoint
+- Add query parsing logic
 
-These are separated because the middleware depends on these utilities existing first.
+These are separated because the service depends on these utilities existing first.
 
 ---
 
 ### ⚠️ Review Notes
 
 - **Risk Level**: Low
-- **Key Files**: `src/utils/jwt.ts`
-- **Testing**: Unit tests included, run `npm test -- jwt`
+- **Key Files**: `src/utils/search.ts`
+- **Testing**: Unit tests included, run `npm test -- search`
 
 ---
 
@@ -103,8 +103,8 @@ These are separated because the middleware depends on these utilities existing f
 
 | PR | Status | Description |
 |----|--------|-------------|
-| #455 | 👀 This PR | JWT utilities |
-| #456 | 🔄 Open | Auth middleware |
+| #455 | 👀 This PR | Search utilities |
+| #456 | 🔄 Open | Search service |
 | #457 | 🔄 Open | Tests & docs |
 ```
 
@@ -121,27 +121,27 @@ These are separated because the middleware depends on these utilities existing f
 
 ### 📋 Changes in This PR
 
-- Add `authMiddleware` using utilities from PR A
-- Implement `/login` and `/logout` routes
-- Add session storage logic
+- Add `SearchService` using utilities from PR A
+- Implement `/search` API endpoint
+- Add query parsing and filtering logic
 
 ---
 
 ### 🔄 Delta from Previous PR
 
 **Building on PR A (#455)**:
-- PR A added the JWT utilities
-- This PR USES those utilities to build the actual middleware
-- Separated because: middleware logic is feature code, utilities are foundation
+- PR A added the search utilities
+- This PR USES those utilities to build the actual service
+- Separated because: service logic is feature code, utilities are foundation
 
 ---
 
 ### ➡️ What Next PR Will Add
 
 PR C (#457) will:
-- Add integration tests for auth flow
+- Add integration tests for search flow
 - Update API documentation
-- Export auth module from index
+- Export search module from index
 
 Separated because: tests should verify the complete feature, not partial implementation.
 
@@ -150,8 +150,8 @@ Separated because: tests should verify the complete feature, not partial impleme
 ### ⚠️ Review Notes
 
 - **Risk Level**: Medium
-- **Key Files**: `src/middleware/auth.ts`, `src/routes/auth.ts`
-- **Testing**: Requires PR A merged first, then `npm test -- auth`
+- **Key Files**: `src/services/search.ts`, `src/routes/search.ts`
+- **Testing**: Requires PR A merged first, then `npm test -- search`
 
 ---
 
@@ -159,8 +159,8 @@ Separated because: tests should verify the complete feature, not partial impleme
 
 | PR | Status | Description |
 |----|--------|-------------|
-| #455 | ✅ Merged | JWT utilities |
-| #456 | 👀 This PR | Auth middleware |
+| #455 | ✅ Merged | Search utilities |
+| #456 | 👀 This PR | Search service |
 | #457 | 🔄 Open | Tests & docs |
 ```
 

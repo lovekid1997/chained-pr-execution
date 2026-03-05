@@ -16,7 +16,7 @@ feat/<issue-number>-<layer>[-description]
 
 Examples:
 - feat/123-a-add-utils
-- feat/123-b-implement-auth
+- feat/123-b-add-service
 - feat/123-c-add-tests
 ```
 

@@ -72,31 +72,31 @@ From HOW, generate:
 ### Issue
 ```markdown
 ## Problem
-Need to add JWT authentication to the API.
+Need to add full-text search to the application.
 
 ## HOW
-1. Create JWT utility functions (sign, verify, decode)
-2. Add TokenPayload and AuthConfig types
-3. Implement authMiddleware
-4. Add /login and /logout routes
+1. Create search utility functions (indexer, query parser)
+2. Add SearchQuery and SearchResult types
+3. Implement SearchService
+4. Add /search API endpoint
 5. Write integration tests
 6. Update API documentation
 
 ## Acceptance Criteria
-- [ ] JWT tokens expire after 1 hour
-- [ ] Refresh tokens supported
-- [ ] All auth routes tested
+- [ ] Search returns results in < 100ms
+- [ ] Supports fuzzy matching
+- [ ] All search endpoints tested
 ```
 
 ### Parsed Plan
 ```
 Layer A (Foundation):
-- Step 1: JWT utilities
+- Step 1: Search utilities
 - Step 2: Types
 
 Layer B (Feature):
-- Step 3: authMiddleware
-- Step 4: Routes
+- Step 3: SearchService
+- Step 4: API endpoint
 
 Layer C (Integration):
 - Step 5: Tests

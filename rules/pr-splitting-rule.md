@@ -62,18 +62,18 @@ A depends on B, B depends on A - impossible to merge.
 
 ### Good Split
 ```
-Issue: Add user authentication
+Issue: Add search feature
 
-PR A: Add JWT utility functions
-PR B: Implement auth middleware + routes
+PR A: Add search utility functions (indexer, parser)
+PR B: Implement search service + API endpoint
 PR C: Add tests + update API docs
 ```
 
 ### Bad Split
 ```
-Issue: Add user authentication
+Issue: Add search feature
 
-PR A: Add login route (incomplete without middleware)
-PR B: Add middleware (incomplete without JWT utils)
-PR C: Add JWT utils (should be first!)
+PR A: Add search endpoint (incomplete without service)
+PR B: Add service (incomplete without utilities)
+PR C: Add utilities (should be first!)
 ```

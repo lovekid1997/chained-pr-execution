@@ -11,15 +11,15 @@
     "workflow",
     "automation"
   ],
-  "author": "",
+  "author": "lovekid1997",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/lovekid1997/chained-pr-execution.git"
   },
-  "homepage": "",
+  "homepage": "https://github.com/lovekid1997/chained-pr-execution",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/lovekid1997/chained-pr-execution/issues"
   },
   "claude-skill": {
     "name": "chained-pr-execution",

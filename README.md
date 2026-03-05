@@ -17,7 +17,7 @@ Large features are hard to review. A single 1000-line PR is:
 Split into **atomic, chained PRs** that tell a story:
 
 ```
-Issue #123: Add user authentication
+Issue #123: Add search feature
          │
          ▼
     ┌─────────┐     ┌─────────┐     ┌─────────┐
@@ -67,13 +67,13 @@ Your issue should have a HOW section:
 
 ```markdown
 ## Problem
-Need to add JWT authentication.
+Need to add full-text search to the application.
 
 ## HOW
-1. Create JWT utility functions
-2. Add TokenPayload types
-3. Implement auth middleware
-4. Add login/logout routes
+1. Create search utility functions (indexer, query parser)
+2. Add SearchQuery and SearchResult types
+3. Implement search service
+4. Add /search API endpoint
 5. Write integration tests
 6. Update API docs
 ```
@@ -82,10 +82,10 @@ Need to add JWT authentication.
 
 | HOW Step | Layer | Why |
 |----------|-------|-----|
-| JWT utilities | **A** | Foundation - others depend on this |
+| Search utilities | **A** | Foundation - others depend on this |
 | Types | **A** | Foundation - shared definitions |
-| Auth middleware | **B** | Feature - main logic |
-| Routes | **B** | Feature - uses middleware |
+| Search service | **B** | Feature - main logic |
+| API endpoint | **B** | Feature - uses service |
 | Tests | **C** | Integration - tests complete feature |
 | Docs | **C** | Integration - documents final API |
 
@@ -93,8 +93,8 @@ Need to add JWT authentication.
 
 ```
 main
- └── PR A: [A] #123 - JWT utilities & types
-      └── PR B: [B] #123 - Auth middleware & routes
+ └── PR A: [A] #123 - Search utilities & types
+      └── PR B: [B] #123 - Search service & endpoint
            └── PR C: [C] #123 - Tests & documentation
 ```
 
@@ -113,13 +113,13 @@ Each PR gets a **Chain Report** comment:
 **Unblocks**: #457
 
 ### 📋 Changes in This PR
-- Implement auth middleware using JWT utils from PR A
-- Add /login and /logout routes
+- Implement search service using utilities from PR A
+- Add /search API endpoint
 
 ### 🔄 Delta from Previous PR
-**PR A established**: JWT utilities, TokenPayload types
-**This PR adds**: Actual middleware and routes that USE those utilities
-**Why separate**: Middleware is feature code; utilities are foundation
+**PR A established**: Search utilities, SearchQuery types
+**This PR adds**: Actual service and endpoint that USE those utilities
+**Why separate**: Service is feature code; utilities are foundation
 
 ### ➡️ What Next PR Will Add
 PR C will add integration tests and API documentation.
@@ -128,8 +128,8 @@ Separated because tests should verify the complete feature.
 ### 📊 Chain Overview
 | PR | Status | Description |
 |----|--------|-------------|
-| #455 | ✅ Merged | JWT utilities |
-| #456 | 👀 This PR | Auth middleware |
+| #455 | ✅ Merged | Search utilities |
+| #456 | 👀 This PR | Search service |
 | #457 | 🔄 Open | Tests & docs |
 ```
 
@@ -190,8 +190,8 @@ Edit `rules/pr-chain-rule.md`:
 
 ```
 feat/<issue>-<layer>[-description]
-→ feat/123-a-jwt-utils
-→ feat/123-b-auth-middleware
+→ feat/123-a-search-utils
+→ feat/123-b-search-service
 ```
 
 ### Modify Comment Format

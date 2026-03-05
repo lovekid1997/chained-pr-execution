@@ -27,7 +27,7 @@ Every comment MUST reference:
 When referencing another PR's content:
 ```markdown
 As established in PR A (#455):
-> "Added validateToken() utility that handles JWT verification"
+> "Added buildSearchIndex() utility that handles indexing"
 
 This PR extends that by...
 ```
@@ -39,12 +39,12 @@ This PR extends that by...
 ### 🔄 Delta from Previous PR
 
 **Foundation from #455**:
-- Types: `TokenPayload`, `AuthConfig`
-- Utils: `validateToken()`, `generateToken()`
+- Types: `SearchQuery`, `SearchResult`
+- Utils: `buildSearchIndex()`, `parseQuery()`
 
 **This PR adds**:
-- Middleware that USES these types and utils
-- Route handlers that CALL the middleware
+- Service that USES these types and utils
+- Route handlers that CALL the service
 ```
 
 ### Pattern 2: Preview Link
@@ -52,7 +52,7 @@ This PR extends that by...
 ### ➡️ What Next PR Will Add
 
 PR C (#457) will complete the feature by:
-- Testing the auth flow we built here
+- Testing the search flow we built here
 - Documenting the API endpoints
 - Exporting for external use
 
@@ -69,8 +69,8 @@ When ANY PR in chain changes status, update ALL chain comments:
 
 | PR | Status | Description |
 |----|--------|-------------|
-| #455 | ✅ Merged (abc123) | JWT utilities |
-| #456 | 👀 In Review | Auth middleware |
+| #455 | ✅ Merged (abc123) | Search utilities |
+| #456 | 👀 In Review | Search service |
 | #457 | ⏸️ Blocked by #456 | Tests & docs |
 ```
 
@@ -117,7 +117,7 @@ For each PR comment, verify:
 ### ❌ Isolated Comment
 ```markdown
 ## Changes
-- Added auth middleware
+- Added search service
 ```
 Missing: chain context, dependencies, narrative
 
