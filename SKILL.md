@@ -8,12 +8,12 @@ argument-hint: [issue-number]
 
 # Chained PR Execution Workflow
 
-Execute issue **#$ARGUMENTS** following the company's chained PR workflow.
+Execute issue **#$ARGUMENTS** following the chained PR workflow.
 
 ## Workflow Overview
 
 ```
-Issue (with HOW) → Implement → Split PRs → Chain (A←B←C) → Report Comments
+Issue (with HOW) → Implement → Split PRs → Chain (A←B←C) → Report Comments → AI Review → Fix/Appeal
 ```
 
 ## Step 1: Parse Issue
@@ -76,6 +76,47 @@ Comments are NOT independent - they reference each other and form a coherent nar
 
 See [comment-linking-rule.md](rules/comment-linking-rule.md) for linking rules.
 
+## Step 6: AI Code Review
+
+After creating PRs, trigger AI review and handle feedback:
+
+### 6.1 Add Review Label
+
+```bash
+gh pr edit <pr-number> --add-label "AI REVIEW PR FAIL"
+```
+
+### 6.2 Wait for AI Review Comment
+
+Monitor for comment from `mmenutech` containing "🤖 AI Code Review":
+
+```bash
+# Check for AI review comment
+gh pr view <pr-number> --json comments --jq '.comments[] | select(.author.login == "mmenutech") | select(.body | contains("AI Code Review"))'
+```
+
+### 6.3 Handle AI Review Feedback
+
+For each issue raised by AI reviewer:
+- **If valid issue**: Fix the code, commit, push
+- **If false positive**: Add reply comment explaining why (appeal)
+
+```bash
+# Reply to review comment
+gh pr comment <pr-number> --body "**Appeal**: <explanation why this is not an issue>"
+
+# Or fix and push
+git add <files>
+git commit -m "fix: address AI review feedback - <issue>"
+git push
+```
+
+### 6.4 Remove Review Label (after all issues resolved)
+
+```bash
+gh pr edit <pr-number> --remove-label "AI REVIEW PR FAIL"
+```
+
 ## Validation Checklist
 
 - [ ] Each PR is atomic (single logical change)
@@ -83,6 +124,7 @@ See [comment-linking-rule.md](rules/comment-linking-rule.md) for linking rules.
 - [ ] Each PR has chain report comment
 - [ ] Comments reference related PRs
 - [ ] All tests pass on each PR
+- [ ] AI Code Review issues resolved or appealed
 
 ## Quick Commands
 
